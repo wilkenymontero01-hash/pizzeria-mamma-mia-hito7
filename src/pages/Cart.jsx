@@ -1,122 +1,73 @@
-import React, { useState } from "react";
-
-const initialCart = [
-  {
-    id: "p001",
-    name: "Napolitana",
-    price: 5950,
-    count: 1,
-    img: "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?q=80&w=200",
-  },
-  {
-    id: "p002",
-    name: "Española",
-    price: 7250,
-    count: 1,
-    img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=200",
-  },
-  {
-    id: "p003",
-    name: "Salame",
-    price: 5990,
-    count: 1,
-    img: "https://images.unsplash.com/photo-1628840042765-356cda07504e?q=80&w=200",
-  },
-];
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
 
 const Cart = () => {
-  const [cart, setCart] = useState(initialCart);
+  const { cart, incrementQuantity, decrementQuantity, calculateTotal } = useContext(CartContext);
 
-  const increaseCount = (id) => {
-    setCart(
-      cart.map((item) =>
-        item.id === id ? { ...item, count: item.count + 1 } : item
-      )
-    );
-  };
+  return (
+    <div className="container my-5">
+      <h2 className="mb-4">Detalles del pedido:</h2>
 
-  const decreaseCount = (id) => {
-    setCart(
-      cart
-        .map((item) =>
-          item.id === id ? { ...item, count: item.count - 1 } : item
-        )
-        .filter((item) => item.count > 0)
-    );
-  };
+      {cart.length === 0 ? (
+        <div className="alert alert-warning text-center" role="alert">
+          Tu carrito está vacío. ¡Agrega algunas pizzas deliciosas desde el Home! 🍕
+        </div>
+      ) : (
+        <div>
+          {cart.map((item) => (
+            <div 
+              key={item.id} 
+              className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3"
+            >
+              {/* Información de la pizza (Imagen y Nombre) */}
+              <div className="d-flex align-items-center">
+                <img 
+                  src={item.img} 
+                  alt={item.name} 
+                  style={{ width: "70px", height: "70px", objectFit: "cover" }} 
+                  className="me-3 rounded shadow-sm" 
+                />
+                <h5 className="mb-0 text-capitalize">{item.name}</h5>
+              </div>
 
-  const total = cart.reduce((acc, item) => acc + item.price * item.count, 0);
+              {/* Controles de cantidad y precio */}
+              <div className="d-flex align-items-center">
+                <span className="fw-bold me-4 text-success">
+                  ${(item.price * item.count).toLocaleString("es-CL")}
+                </span>
+                
+                <button 
+                  className="btn btn-outline-danger btn-sm px-2" 
+                  onClick={() => decrementQuantity(item.id)}
+                >
+                  -
+                </button>
+                
+                <span className="mx-3 fw-bold fs-5">{item.count}</span>
+                
+                <button 
+                  className="btn btn-outline-primary btn-sm px-2" 
+                  onClick={() => incrementQuantity(item.id)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          ))}
 
-  return React.createElement(
-    "div",
-    { className: "container my-5", style: { maxWidth: "600px" } },
-    React.createElement("h3", { className: "mb-4 fw-bold" }, "Detalles del pedido:"),
-    React.createElement(
-      "div",
-      { className: "card p-3 shadow-sm" },
-      cart.length === 0
-        ? React.createElement("p", { className: "text-center my-3" }, "El carrito está vacío 🛒")
-        : cart.map((item) =>
-            React.createElement(
-              "div",
-              {
-                key: item.id,
-                className: "d-flex align-items-center justify-content-between border-bottom py-2",
-              },
-              React.createElement(
-                "div",
-                { className: "d-flex align-items-center gap-3" },
-                React.createElement("img", {
-                  src: item.img,
-                  alt: item.name,
-                  style: {
-                    width: "60px",
-                    height: "60px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                  },
-                }),
-                React.createElement("h6", { className: "mb-0 text-capitalize" }, item.name)
-              ),
-              React.createElement(
-                "div",
-                { className: "d-flex align-items-center gap-3" },
-                React.createElement(
-                  "span",
-                  { className: "fw-bold text-dark" },
-                  "$" + (item.price * item.count).toLocaleString("es-CL")
-                ),
-                React.createElement(
-                  "button",
-                  {
-                    className: "btn btn-outline-danger btn-sm",
-                    onClick: () => decreaseCount(item.id),
-                  },
-                  "-"
-                ),
-                React.createElement("span", { className: "fw-bold" }, item.count),
-                React.createElement(
-                  "button",
-                  {
-                    className: "btn btn-outline-primary btn-sm",
-                    onClick: () => increaseCount(item.id),
-                  },
-                  "+"
-                )
-              )
-            )
-          ),
-      React.createElement(
-        "div",
-        { className: "d-flex justify-content-between align-items-center mt-4" },
-        React.createElement("h4", { className: "fw-bold m-0" }, "Total: $" + total.toLocaleString("es-CL")),
-        React.createElement(
-          "button",
-          { className: "btn btn-dark", disabled: cart.length === 0 },
-          "Pagar"
-        )
-      )
-    )
+          {/* Total de la compra (Requerimiento 5: debe coincidir con el del navbar) */}
+          <div className="mt-4 text-end">
+            <h3>Total: ${calculateTotal().toLocaleString("es-CL")}</h3>
+            <button 
+              className="btn btn-dark btn-lg mt-3 px-5"
+              disabled={cart.length === 0}
+            >
+              Pagar
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
