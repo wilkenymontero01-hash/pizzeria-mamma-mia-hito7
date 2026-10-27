@@ -1,69 +1,80 @@
-import { useContext } from "react";
-import { CartContext } from "../context/CartContext";
+
+import { useContext } from 'react';
+import { CartContext } from '../context/CartContext';
+import { UserContext } from '../context/UserContext';
 
 const Cart = () => {
-  const { cart, incrementQuantity, decrementQuantity, calculateTotal } = useContext(CartContext);
+  const { cart, increaseCount, decreaseCount, total } = useContext(CartContext) || {};
+  const { token } = useContext(UserContext) || {};
 
   return (
-    <div className="container my-5">
-      <h2 className="mb-4">Detalles del pedido:</h2>
+    <div className="container mt-5" style={{ maxWidth: '800px' }}>
+      <h3 className="text-center mb-4">Detalles del pedido:</h3>
 
-      {cart.length === 0 ? (
-        <div className="alert alert-warning text-center" role="alert">
-          Tu carrito está vacío. ¡Agrega algunas pizzas deliciosas desde el Home! 🍕
-        </div>
+      {cart?.length === 0 ? (
+        <p className="text-center text-muted fs-5">Tu carrito está vacío 🍕</p>
       ) : (
-        <div>
-          {cart.map((item) => (
-            <div 
-              key={item.id} 
-              className="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3"
-            >
-              {/* Información de la pizza (Imagen y Nombre) */}
-              <div className="d-flex align-items-center">
-                <img 
-                  src={item.img} 
-                  alt={item.name} 
-                  style={{ width: "70px", height: "70px", objectFit: "cover" }} 
-                  className="me-3 rounded shadow-sm" 
-                />
-                <h5 className="mb-0 text-capitalize">{item.name}</h5>
-              </div>
+        <div className="card p-4 shadow-sm">
+          <ul className="list-group list-group-flush mb-4">
+            {cart?.map((pizza) => (
+              <li
+                key={pizza.id}
+                className="list-group-item d-flex justify-content-between align-items-center px-0"
+              >
+                <div className="d-flex align-items-center gap-3">
+                  <img
+                    src={pizza.img}
+                    alt={pizza.name}
+                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
+                  />
+                  <span className="fw-bold text-capitalize fs-5">{pizza.name}</span>
+                </div>
 
-              {/* Controles de cantidad y precio */}
-              <div className="d-flex align-items-center">
-                <span className="fw-bold me-4 text-success">
-                  ${(item.price * item.count).toLocaleString("es-CL")}
-                </span>
-                
-                <button 
-                  className="btn btn-outline-danger btn-sm px-2" 
-                  onClick={() => decrementQuantity(item.id)}
-                >
-                  -
-                </button>
-                
-                <span className="mx-3 fw-bold fs-5">{item.count}</span>
-                
-                <button 
-                  className="btn btn-outline-primary btn-sm px-2" 
-                  onClick={() => incrementQuantity(item.id)}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          ))}
+                <div className="d-flex align-items-center gap-3">
+                  <span className="fw-bold fs-5 me-2">
+                    ${(pizza.price * pizza.count).toLocaleString('es-CL')}
+                  </span>
+                  
+                  {/* Botón Decrementar */}
+                  <button
+                    className="btn btn-outline-danger btn-sm px-3"
+                    onClick={() => decreaseCount && decreaseCount(pizza.id)}
+                  >
+                    -
+                  </button>
 
-          {/* Total de la compra (Requerimiento 5: debe coincidir con el del navbar) */}
-          <div className="mt-4 text-end">
-            <h3>Total: ${calculateTotal().toLocaleString("es-CL")}</h3>
-            <button 
-              className="btn btn-dark btn-lg mt-3 px-5"
-              disabled={cart.length === 0}
+                  <span className="fw-bold fs-5 px-1">{pizza.count}</span>
+
+                  {/* Botón Incrementar */}
+                  <button
+                    className="btn btn-outline-primary btn-sm px-3"
+                    onClick={() => increaseCount && increaseCount(pizza.id)}
+                  >
+                    +
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="text-center border-top pt-3">
+            <h2 className="fw-bold my-3">
+              Total: ${total?.toLocaleString('es-CL')}
+            </h2>
+
+            {/* Botón de Pago según autenticación */}
+            <button
+              className="btn btn-dark btn-lg px-4"
+              disabled={!token}
             >
-              Pagar
+              Pagar 🛒
             </button>
+
+            {!token && (
+              <p className="text-danger mt-2 small">
+                Debes iniciar sesión para poder realizar el pago.
+              </p>
+            )}
           </div>
         </div>
       )}

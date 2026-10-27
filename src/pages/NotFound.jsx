@@ -1,19 +1,20 @@
 
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Container, Button } from 'react-bootstrap'
+
+import { Link } from 'react-router-dom';
 
 const NotFound = () => {
   return (
-    <Container className="text-center my-5">
+    <div className="container text-center my-5 py-5">
       <h1 className="display-1 fw-bold text-danger">404</h1>
-      <h2>¡Oops! La página que buscas no existe.</h2>
-      <p className="text-muted">Parece que te has perdido del camino a la pizzería.</p>
-      <Link to="/">
-        <Button variant="dark">Volver al Inicio</Button>
+      <h2 className="mb-3">¡Página no encontrada! 🍕</h2>
+      <p className="lead text-muted mb-4">
+        Parece que la página que estás buscando no existe o la pizza se la comió alguien más.
+      </p>
+      <Link to="/" className="btn btn-dark btn-lg">
+        Volver al Inicio 🏠
       </Link>
-    </Container>
-  )
-}
+    </div>
+  );
+};
 
-export default NotFound
+export default NotFound;

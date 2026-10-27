@@ -1,43 +1,42 @@
-import { useState, useEffect } from "react";
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const Pizza = () => {
-  const [pizza, setPizza] = useState({});
+  const { id } = useParams();
+  const [pizza, setPizza] = useState(null);
 
   useEffect(() => {
-    const obtenerPizza = async () => {
+    const fetchPizza = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/pizzas/p001");
-        const data = await response.json();
+        const res = await fetch(`http://localhost:5000/api/pizzas/${id}`);
+        const data = await res.json();
         setPizza(data);
       } catch (error) {
-        console.error("Error al cargar la pizza:", error);
+        console.error("Error al obtener la pizza:", error);
       }
     };
+    fetchPizza();
+  }, [id]);
 
-    obtenerPizza();
-  }, []);
+  if (!pizza) return <div className="container mt-5"><h3>Cargando detalles de la pizza...</h3></div>;
 
   return (
-    <div className="container my-5 d-flex justify-content-center">
-      <div className="card" style={{ width: "24rem" }}>
-       <img 
-  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=500&q=80" 
-  className="card-img-top" 
-  alt={pizza.name} 
-  style={{ height: "200px", objectFit: "cover" }} 
-/> 
-
+    <div className="container mt-5 d-flex justify-content-center">
+      <div className="card shadow" style={{ maxWidth: '500px' }}>
+        <img src={pizza.img} className="card-img-top" alt={pizza.name} />
         <div className="card-body">
-          <h2 className="card-title">{pizza.name}</h2>
+          <h2 className="card-title text-capitalize">{pizza.name}</h2>
           <p className="card-text">{pizza.desc}</p>
-          <p className="fw-bold">Ingredientes:</p>
+          
+          <h5 className="mt-3">Ingredientes:</h5>
           <ul>
-            {pizza.ingredients?.map((ing, i) => (
-              <li key={i}>{ing}</li>
+            {pizza.ingredients?.map((ing, index) => (
+              <li key={index} className="text-capitalize">🍕 {ing}</li>
             ))}
           </ul>
-          <h3>Precio: ${pizza.price}</h3>
-          <button className="btn btn-dark w-100">Añadir 🛒</button>
+          
+          <h4 className="mt-4 text-success">Precio: ${pizza.price?.toLocaleString('es-CL')}</h4>
         </div>
       </div>
     </div>
